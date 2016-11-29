@@ -16,7 +16,7 @@ int main(int argc, char** argv)
     int cPort = DEFAULT_PORT;   //指定端口号
     int cClient = 0;            
     int cLen = 0;
-    struct sockaddr_in cli;       //定义client端地址
+    struct sockaddr_in cli;       //定义server端地址
     char cbuf[4096] = {0};
     
     if(argc < 2)
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
         return -1; 
     }
     
-    if(connect(cClient, (struct sockaddr*)&cli, sizeof(cli)) < 0)
+    if(connect(cClient, (struct sockaddr*)&cli, sizeof(cli)) < 0)   //连接server端
     {
         printf("connect() failure!\n");
         return -1;
