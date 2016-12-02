@@ -10,15 +10,15 @@
 #include <unistd.h>
 #include <assert.h>
 
-#define IPADDR			"127.0.0.1"
+#define IPADDR			"172.17.0.130"
 #define PORT			8787
 #define MAXLINE			1024
-#define LISTENQ			5
+#define LISTENQ			5       //请求连接的最大数
 #define SIZE			10
 
 typedef struct server_context_st
 {
-	int cli_cnt;		/*客户端个数*/
+	int cli_cnt;		/*客户端总数*/
 	int clifds[SIZE];   /*客户端的个数*/
 	fd_set allfds;		/*句柄集合*/
 	int maxfd;			/*句柄最大值*/ 
@@ -187,6 +187,8 @@ static void server_uninit(void)
 	}
 }
 
+
+/**/
 static int server_init(void)
 {
 	s_srv_ctx = (server_context_st *)malloc(sizeof(server_context_st));
