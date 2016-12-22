@@ -1,0 +1,4 @@
+watch.c函数主要实现监视/opt/watch目录下是否有传过来目录
+有则将目录名作为run.sh 的参数启动run.sh
+如果传来的不是目录，会输出“please input a directoy"的提示信息
+
