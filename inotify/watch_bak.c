@@ -1,10 +1,3 @@
-/**************************************************
- *用inotify机制监视/opt/watch/
- *用epoll机制实现监视inotify_init()返回的文件描述符
- *当监视到/opt/watch/有目录时调用执行箱的脚本
- *Author:zldao
- *Date:2016-12-22
- **************************************************/
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
@@ -19,12 +12,10 @@
 #include <sys/inotify.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include <sys/epoll.h>
 
 #define MAXCOUNT 500
-#define MAXEVENTS 3 
 
-/*read监视的fd  执行启动沙箱脚本*/
+// 3. read & process
 int process_inotifyevent(int fd)
 {
 	int count = 0;
@@ -33,7 +24,10 @@ int process_inotifyevent(int fd)
 	char buf[MAXCOUNT];
 	int pid;
 
-	count =read(fd,buf,MAXCOUNT);   
+
+	count =read(fd,buf,MAXCOUNT);
+	
+	//run to this;
 
 	// 读取出来的数据量小于一个event事件，error
 	if(count < sizeof(*event))
@@ -92,44 +86,17 @@ void handler(int num)
 
 int main(int argc, char** argv)
 {
-
 	int mINotifyFd=0;
-	int epollfd=0;
-	int nfds,i;
-	struct epoll_event epevent,events[MAXEVENTS];
-
-	mINotifyFd = inotify_init();   //初始化，
-	inotify_add_watch(mINotifyFd, "/opt/watch",IN_MOVED_TO | IN_CREATE);//监听/opt/watch目录下的是否有新的目录和文件
-
-	epollfd = epoll_create1(0);
-	if(epollfd < 0){
-		perror("epoll_create()");
-		exit(1);
-	}
-	epevent.events = EPOLLIN;
-	epevent.data.fd = mINotifyFd;
-	if(epoll_ctl(epollfd,EPOLL_CTL_ADD,mINotifyFd,&epevent) < 0){
-		perror("epoll_ctl:mINotifyFd");
-		exit(1);
-	}
-
+	// 1
+	mINotifyFd = inotify_init();
+	// 2
+	inotify_add_watch(mINotifyFd, "/opt/watch",IN_MOVED_TO | IN_CREATE);//监听xxx目录下的 move 、事件是否为目录
 
 	signal(SIGCHLD,handler);
 
 	while(1)
 	{
-		nfds = epoll_wait(epollfd,events,MAXEVENTS,-1);
-		if(nfds < 0){
-			perror("epoll_wait");
-			exit(1);
-		}
-		for(i = 0; i < nfds; i++){
-			if(events[1].data.fd = mINotifyFd){
-				process_inotifyevent(mINotifyFd);		
-			}else{
-				continue;
-			}
-		}
+		process_inotifyevent(mINotifyFd);
 	}
 
 	return 0;
