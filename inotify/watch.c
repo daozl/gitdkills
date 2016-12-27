@@ -52,6 +52,7 @@ int process_inotifyevent(int fd)
 			printf("have event\n");
 			if((cur->mask & IN_MOVED_TO) || (cur->mask & IN_CREATE)){
 				if(cur->mask & IN_ISDIR){
+					
 					pid = fork();
 					if(pid < 0){
 						perror("fork() failed");
@@ -120,6 +121,8 @@ int main(int argc, char** argv)
 	{
 		nfds = epoll_wait(epollfd,events,MAXEVENTS,-1);
 		if(nfds < 0){
+			if(errno == EINTR)
+				continue;
 			perror("epoll_wait");
 			exit(1);
 		}
