@@ -59,7 +59,7 @@ int process_inotifyevent(int fd)
 						exit(1);
 					}
 					if(pid == 0){
-						execl("./run.sh","./run.sh",cur->name,NULL);
+						execl("/opt/malware_sandbox_deploy/run.sh","./run.sh",cur->name,NULL);
 						perror("execl() failed");
 						exit(1);
 					}    
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 	struct epoll_event epevent,events[MAXEVENTS];
 
 	mINotifyFd = inotify_init();   //初始化，
-	inotify_add_watch(mINotifyFd, "/opt/watch",IN_MOVED_TO | IN_CREATE);//监听/opt/watch目录下的是否有新的目录和文件
+	inotify_add_watch(mINotifyFd, "/opt/input",IN_MOVED_TO | IN_CREATE);//监听/opt/watch目录下的是否有新的目录和文件
 
 	epollfd = epoll_create1(0);
 	if(epollfd < 0){
